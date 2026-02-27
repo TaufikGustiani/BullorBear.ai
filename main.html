@@ -394,3 +394,69 @@
       <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;margin-bottom:0.75rem;">
         BPS = basis points. 10000 bps = 100%. Threshold is set by the contract guardian. Reporter submits drawdowns (peak, current) and the contract computes drawdown bps. When drawdown bps ≥ threshold bps, exit is recommended. Advisories have severity 0–5. This dashboard auto-refreshes every 20 seconds when a contract is loaded; use Refresh for an immediate update.
       </p>
+      <ul class="quick-ref-list">
+        <li>Connect wallet → paste BearDet address → data loads automatically.</li>
+        <li>Exit readiness 100% = latest drawdown at or above threshold.</li>
+        <li>Signals tab shows last 10 exit signals (value in bps).</li>
+        <li>Drawdowns tab shows last 10 snapshots with bps.</li>
+        <li>Advisories tab shows last 10 advisories with severity.</li>
+        <li>Config tab shows guardian, reporter, treasury, threshold, halted, deploy block.</li>
+      </ul>
+    </div>
+
+    <div class="list-card">
+      <h2>Browser support</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        This dashboard works in modern browsers with Web3 wallet support (e.g. MetaMask, WalletConnect-compatible wallets). You must have a wallet extension or mobile wallet that injects <code>window.ethereum</code>. The page uses ethers.js v6 for contract reads. No server-side component is required; all data is read directly from the blockchain via your connected wallet's RPC.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>URL parameters</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        You can prefill the contract address via the query string: <code>?contract=0xYourBearDetAddress</code>. Example: <code>https://yoursite.com/?contract=0x1234...abcd</code>. On load, if a contract param is present, the input is filled and the contract is loaded when the wallet is already connected.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Data flow</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        Reporter calls BearDet.recordDrawdown(drawdownBps, peakValue, currentValue). When drawdownBps ≥ threshold (set by guardian), the contract emits an exit signal. Reporter can also call raiseExitSignal(indicatorId, value, threshold, labelHash) and postExitAdvisory(severity). This dashboard reads dashboardSummary(), exitReadinessBps(), recentSignals(), recentDrawdowns(), getAdvisoryRange(), getConfig(), and getDrawdownSeries() to display the gauge, stats, lists, and chart. No writes are performed by this UI.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Integration</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        If you embed this page in an iframe, you can call <code>window.BullorBearRefresh()</code> to trigger a dashboard refresh, <code>window.BullorBearConnect()</code> to open the connect flow, and <code>window.BullorBearDisconnect()</code> to disconnect the wallet. The contract address is stored in <code>localStorage</code> under the key <code>BullorBear_contractAddress</code> so returning users do not need to re-enter it.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Summary</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        BullorBear.ai is a read-only dashboard for BearDet contracts. It shows exit readiness, drawdown history, exit signals, and advisories to help you monitor bear market conditions and decide when to consider reducing exposure. Connect your wallet, enter your BearDet contract address, and use the tabs and refresh button to stay updated. This is not financial advice.
+      </p>
+    </div>
+
+    <div class="divider"></div>
+    <footer>BullorBear.ai · Bear market indicators · Not financial advice</footer>
+  </div>
+
+  <script>
+    (function() {
+      const BPS_DENOM = 10000;
+      const REFRESH_INTERVAL_MS = 20000;
+      const MAX_SIGNALS_DISPLAY = 10;
+      const MAX_DRAWDOWNS_DISPLAY = 10;
+      const MAX_ADVISORIES_DISPLAY = 10;
+      const DRAWDOWN_SERIES_LEN = 10;
+      let provider = null;
+      let signer = null;
+      let contract = null;
+      let walletAddress = null;
+      let lastSummary = null;
+
+      const $ = (id) => document.getElementById(id);
+      const showMsg = (text, type) => {
+        const box = $('messageBox');
