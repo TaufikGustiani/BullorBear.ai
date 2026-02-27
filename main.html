@@ -328,3 +328,69 @@
         <dd>On-chain contract that records drawdowns, exit signals, and advisories. Used by this dashboard as the data source.</dd>
         <dt>Drawdown</dt>
         <dd>Decline from a peak value. Expressed in basis points (bps): 10000 bps = 100%.</dd>
+        <dt>Exit readiness</dt>
+        <dd>Percentage derived from latest drawdown vs threshold. At 100%, the contract recommends considering an exit.</dd>
+        <dt>Guardian</dt>
+        <dd>Contract role that can set the drawdown threshold and halt the system.</dd>
+        <dt>Reporter</dt>
+        <dd>Contract role that can submit drawdowns, raise signals, and post advisories.</dd>
+        <dt>TimeToExit</dt>
+        <dd>Python counterpart to BearDet for off-chain or backend exit logic and dashboards.</dd>
+      </dl>
+    </div>
+
+    <div class="list-card">
+      <h2>Disclaimer</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        BullorBear.ai is a dashboard that reads public on-chain data from BearDet contracts. It does not hold your funds, execute trades, or provide financial, legal, or tax advice. Exit readiness and advisories are based solely on data submitted to the contract and may be incomplete or delayed. You are solely responsible for your investment decisions. Use this tool for informational purposes only and always do your own research.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Supported contract interface</h2>
+      <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:0.5rem;">This UI calls the following BearDet view functions (read-only):</p>
+      <ul style="font-size:0.82rem;color:var(--text-dim);line-height:1.8;padding-left:1.25rem;">
+        <li>exitReadinessBps() — current exit readiness in basis points</li>
+        <li>dashboardSummary() — snapshots, signals, advisories, latest drawdown, threshold, exit flag</li>
+        <li>recentSignals(limit) — last N exit signal ids, values, blocks</li>
+        <li>recentDrawdowns(limit) — last N drawdown snapshot ids, bps, blocks</li>
+        <li>getAdvisoryRange(from, to) — advisories in index range</li>
+        <li>getConfig() — guardian, reporter, treasury, threshold, halted, deploy block</li>
+        <li>shouldExit() — whether latest drawdown is above threshold</li>
+        <li>snapshotCount(), signalCount(), advisoryCount() — total counts</li>
+        <li>getDrawdownSeries(n) — last n drawdown bps for charting</li>
+      </ul>
+    </div>
+
+    <div class="list-card">
+      <h2>Troubleshooting</h2>
+      <div class="faq-item">
+        <div class="faq-q">Dashboard shows "—" for all stats</div>
+        <div class="faq-a">Ensure your wallet is connected and the contract address is a deployed BearDet contract on the same network as your wallet. Click Refresh after pasting the address.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">"Invalid contract or network"</div>
+        <div class="faq-a">The address may be wrong, or the contract is on a different chain. Switch your wallet to the correct network and paste the contract address again.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Exit readiness stays 0%</div>
+        <div class="faq-a">The contract has no drawdown snapshots yet, or the reporter has not submitted any. Drawdowns are recorded by calling recordDrawdown on the contract.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Chart is empty</div>
+        <div class="faq-a">getDrawdownSeries(n) returns the last n drawdown bps. If there are fewer than n snapshots, the chart may be short or empty.</div>
+      </div>
+    </div>
+
+    <div class="list-card">
+      <h2>Risk notice</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;">
+        Cryptocurrency and on-chain systems involve significant risk. Past drawdowns and signals do not guarantee future performance. BearDet and this dashboard are tools for monitoring only; they do not execute trades or manage your assets. You alone are responsible for evaluating when to reduce exposure or exit positions. Never invest more than you can afford to lose. Consult a qualified professional for financial or legal advice.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Quick reference</h2>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.6;margin-bottom:0.75rem;">
+        BPS = basis points. 10000 bps = 100%. Threshold is set by the contract guardian. Reporter submits drawdowns (peak, current) and the contract computes drawdown bps. When drawdown bps ≥ threshold bps, exit is recommended. Advisories have severity 0–5. This dashboard auto-refreshes every 20 seconds when a contract is loaded; use Refresh for an immediate update.
+      </p>
