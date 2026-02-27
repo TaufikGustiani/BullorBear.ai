@@ -526,3 +526,69 @@
           showMsg(e.message || 'Connection failed.', 'error');
         }
       }
+
+      function disconnect() {
+        provider = null;
+        signer = null;
+        contract = null;
+        walletAddress = null;
+        $('walletAddr').textContent = 'Not connected';
+        $('btnConnect').style.display = '';
+        $('btnDisconnect').style.display = 'none';
+        stopRefreshLoop();
+        clearDashboard();
+      }
+
+      function startRefreshLoop() {
+        stopRefreshLoop();
+        refreshIntervalId = setInterval(function() {
+          if (contract) refreshDashboard();
+        }, REFRESH_INTERVAL_MS);
+      }
+      function stopRefreshLoop() {
+        if (refreshIntervalId) {
+          clearInterval(refreshIntervalId);
+          refreshIntervalId = null;
+        }
+      }
+
+      async function loadContractIfSet() {
+        const addr = ($('contractAddr') && $('contractAddr').value || '').trim();
+        if (!addr || !provider) return;
+        try {
+          contract = new ethers.Contract(addr, abi, provider);
+          await refreshDashboard();
+        } catch (e) {
+          showMsg('Invalid contract or network.', 'error');
+        }
+      }
+
+      function clearDashboard() {
+        $('statReadiness').textContent = '—';
+        $('statDrawdown').textContent = '—';
+        $('statThreshold').textContent = '—';
+        $('statSignals').textContent = '—';
+        $('statAdvisories').textContent = '—';
+        const gauge = $('gaugeEl');
+        if (gauge) { gauge.style.setProperty('--pct', '0%'); }
+        $('gaugeValue').textContent = '0%';
+        showAlert('');
+        $('signalsList').innerHTML = '<div class="empty-state">Connect and load contract to see signals.</div>';
+        $('drawdownsList').innerHTML = '<div class="empty-state">Connect and load contract to see drawdowns.</div>';
+        $('advisoriesList').innerHTML = '<div class="empty-state">Connect and load contract to see advisories.</div>';
+        $('configList').innerHTML = '<div class="empty-state">Connect and load contract to see config.</div>';
+        const chartEl = $('drawdownChart');
+        if (chartEl) chartEl.innerHTML = 'Chart: connect contract and refresh to see drawdown series.';
+        const recEl = $('recommendationDetail');
+        if (recEl) recEl.style.display = 'none';
+      }
+
+      function renderSignalsFallback() {
+        $('signalsList').innerHTML = '<div class="empty-state">No contract loaded. Paste BearDet address and ensure wallet is connected.</div>';
+      }
+      function renderDrawdownsFallback() {
+        $('drawdownsList').innerHTML = '<div class="empty-state">No contract loaded. Paste BearDet address and ensure wallet is connected.</div>';
+      }
+      function renderAdvisoriesFallback() {
+        $('advisoriesList').innerHTML = '<div class="empty-state">No contract loaded. Paste BearDet address and ensure wallet is connected.</div>';
+      }
