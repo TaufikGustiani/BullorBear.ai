@@ -460,3 +460,69 @@
       const $ = (id) => document.getElementById(id);
       const showMsg = (text, type) => {
         const box = $('messageBox');
+        if (!box) return;
+        box.innerHTML = text ? `<div class="message ${type || 'info'}">${text}</div>` : '';
+        if (text) setTimeout(() => { box.innerHTML = ''; }, 5000);
+      };
+      const showAlert = (html) => {
+        const box = $('alertBox');
+        if (box) box.innerHTML = html || '';
+      };
+
+      const abi = [
+        'function exitReadinessBps() view returns (uint256)',
+        'function getDrawdownStats() view returns (uint256 totalSnapshots, uint256 totalSignals, uint256 totalAdvisories, uint256 currentThresholdBps, uint256 latestDrawdownBps)',
+        'function dashboardSummary() view returns (uint256 totalSnapshots, uint256 totalSignals, uint256 totalAdvisories, uint256 latestDrawdownBps, uint256 thresholdBps, bool exitRecommended, uint256 treasuryBal)',
+        'function recentSignals(uint256 limit) view returns (uint256[] ids, uint256[] values, uint256[] blocks)',
+        'function recentDrawdowns(uint256 limit) view returns (uint256[] ids, uint256[] bpsList, uint256[] blocks)',
+        'function getConfig() view returns (address guardian, address reporter, address treasury, uint256 thresholdBps, bool halted, uint256 deployBlockNum)',
+        'function getAdvisoryRange(uint256 fromIndex, uint256 toIndex) view returns (uint256[] ids, address[] authors, uint8[] severities, uint256[] atBlocks)',
+        'function shouldExit() view returns (bool)',
+        'function snapshotCount() view returns (uint256)',
+        'function signalCount() view returns (uint256)',
+        'function advisoryCount() view returns (uint256)',
+        'function getDrawdownSeries(uint256 n) view returns (uint256[] bpsSeries)'
+      ];
+
+      // Default display limits (can be overridden if contract returns more)
+      const DEFAULT_SIGNAL_LIMIT = 10;
+      const DEFAULT_DRAWDOWN_LIMIT = 10;
+      const DEFAULT_ADVISORY_LIMIT = 10;
+      const GAUGE_MAX_PCT = 100;
+
+      let refreshIntervalId = null;
+
+      async function updateNetworkBar() {
+        const bar = $('networkBar');
+        if (!bar || !provider) { bar.textContent = 'Network: —'; return; }
+        try {
+          const net = await provider.getNetwork();
+          const name = net.name && net.name !== 'unknown' ? net.name : 'Chain ID ' + net.chainId;
+          bar.textContent = 'Network: ' + name;
+        } catch (_) {
+          bar.textContent = 'Network: —';
+        }
+      }
+
+      async function connect() {
+        try {
+          if (!window.ethereum) {
+            showMsg('Install MetaMask or another Web3 wallet.', 'error');
+            return;
+          }
+          provider = new ethers.BrowserProvider(window.ethereum);
+          const accounts = await provider.send('eth_requestAccounts', []);
+          if (!accounts.length) { showMsg('No account selected.', 'error'); return; }
+          signer = await provider.getSigner();
+          walletAddress = accounts[0];
+          $('walletAddr').textContent = walletAddress.slice(0, 6) + '…' + walletAddress.slice(-4);
+          $('btnConnect').style.display = 'none';
+          $('btnDisconnect').style.display = '';
+          showMsg('Wallet connected.', 'success');
+          await updateNetworkBar();
+          await loadContractIfSet();
+          startRefreshLoop();
+        } catch (e) {
+          showMsg(e.message || 'Connection failed.', 'error');
+        }
+      }
