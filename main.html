@@ -130,3 +130,69 @@
     .message { padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; margin-bottom: 1rem; }
     .message.info { background: rgba(249, 115, 22, 0.08); border: 1px solid var(--bear); color: var(--bear); }
     .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #f87171; }
+    .message.success { background: rgba(34, 197, 94, 0.1); border: 1px solid var(--bull); color: var(--bull); }
+
+    .tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; }
+    .tab { padding: 0.5rem 1rem; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-dim); font-weight: 500; }
+    .tab.active { border-color: var(--bear); color: var(--bear); background: var(--glow-bear); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .empty-state { padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 0.9rem; }
+    footer { text-align: center; padding: 1.5rem 0; font-size: 0.78rem; color: var(--text-dim); }
+    .chart-placeholder { height: 200px; background: var(--bg-panel); border: 1px dashed var(--border); border-radius: var(--radius-sm); margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 0.9rem; }
+    .faq-item { padding: 0.75rem 0; border-bottom: 1px solid var(--border-soft); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .faq-a { font-size: 0.9rem; color: var(--text-dim); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+    .refresh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .section-title { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .network-bar { padding: 0.5rem 1rem; background: var(--bg-panel); border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-dim); text-align: center; }
+    .recommendation { padding: 1rem 1.25rem; border-radius: var(--radius-sm); font-size: 0.95rem; margin-bottom: 1rem; border: 1px solid var(--border-soft); }
+    .recommendation.exit { border-color: var(--bear); background: var(--glow-bear); color: var(--bear); }
+    .recommendation.hold { border-color: var(--bull); background: var(--glow-bull); color: var(--bull); }
+    @media (max-width: 640px) {
+      .app { padding: 1rem 0.75rem; }
+      .logo { font-size: 1.4rem; }
+      .contract-in { width: 100%; max-width: 100%; }
+      .stats-row { flex-direction: column; }
+      .stat-card { min-width: 100%; }
+      .gauge { width: 120px; height: 120px; }
+      .gauge-inner { width: 85px; height: 85px; }
+    }
+    .loading { opacity: 0.7; pointer-events: none; }
+    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+    .badge.bear { background: var(--glow-bear); color: var(--bear); }
+    .badge.bull { background: var(--glow-bull); color: var(--bull); }
+    .meta-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.82rem; color: var(--text-dim); }
+    .glossary dt { font-weight: 600; color: var(--text); margin-top: 0.5rem; font-size: 0.9rem; }
+    .glossary dd { margin-left: 0; margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--text-dim); padding-left: 1rem; }
+    .link-muted { color: var(--text-dim); font-size: 0.85rem; }
+    .divider { height: 1px; background: var(--border-soft); margin: 1rem 0; }
+    .quick-ref-list { font-size: 0.84rem; color: var(--text-dim); line-height: 1.9; padding-left: 1.25rem; }
+    .quick-ref-list li { margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <div class="logo">BullorBear.ai</div>
+        <div class="tagline">Bear market indicators & exit dashboard</div>
+      </div>
+      <div class="header-right">
+        <span class="wallet-addr" id="walletAddr">Not connected</span>
+        <input type="text" class="contract-in" id="contractAddr" placeholder="BearDet contract address" />
+        <button type="button" class="btn primary" id="btnConnect">Connect</button>
+        <button type="button" class="btn" id="btnDisconnect" style="display:none;">Disconnect</button>
+      </div>
+    </header>
+
+    <div class="network-bar" id="networkBar">Network: —</div>
+    <div class="hero">
+      <h1>Exit readiness at a glance</h1>
+      <p>Monitor drawdown, signals, and advisories. When the gauge crosses your threshold, consider reducing exposure.</p>
+    </div>
+
