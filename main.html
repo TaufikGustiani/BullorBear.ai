@@ -658,3 +658,69 @@
             if (shouldExitVal) {
               showAlert('<div class="alert-box exit">Exit recommended: drawdown is above threshold. Consider reducing exposure.</div>');
             } else {
+              showAlert('<div class="alert-box hold">Below exit threshold. Monitor drawdown and signals.</div>');
+            }
+          }
+          const [ids, values, blocks] = await contract.recentSignals(MAX_SIGNALS_DISPLAY).catch(() => [[], [], []]);
+          const signalsList = $('signalsList');
+          if (ids && ids.length > 0) {
+            signalsList.innerHTML = ids.map((id, i) => `<div class="list-item"><span>Signal #${id}</span><span class="val bear">${values[i]} bps</span></div>`).join('');
+          } else {
+            signalsList.innerHTML = '<div class="empty-state">No signals yet.</div>';
+          }
+          const [dIds, dBps, dBlocks] = await contract.recentDrawdowns(MAX_DRAWDOWNS_DISPLAY).catch(() => [[], [], []]);
+          const drawdownsList = $('drawdownsList');
+          if (dIds && dIds.length > 0) {
+            drawdownsList.innerHTML = dIds.map((id, i) => `<div class="list-item"><span>Snapshot #${id}</span><span class="val">${dBps[i]} bps</span></div>`).join('');
+          } else {
+            drawdownsList.innerHTML = '<div class="empty-state">No drawdowns yet.</div>';
+          }
+          const sigCount = await contract.signalCount().catch(() => 0);
+          const advCount = await contract.advisoryCount().catch(() => 0);
+          let advHtml = '<div class="empty-state">No advisories yet.</div>';
+          if (Number(advCount) > 0) {
+            const fromIdx = Math.max(0, Number(advCount) - MAX_ADVISORIES_DISPLAY);
+            const toIdx = Number(advCount) - 1;
+            const [aIds, authors, sevs, aBlocks] = await contract.getAdvisoryRange(fromIdx, toIdx).catch(() => [[], [], [], []]);
+            if (aIds && aIds.length > 0) {
+              advHtml = aIds.map((id, i) => `<div class="list-item"><span>#${id} severity ${sevs[i]}</span><span class="val">${String(authors[i]).slice(0, 10)}…</span></div>`).join('');
+            }
+          }
+          $('advisoriesList').innerHTML = advHtml;
+          const [guardian, reporter, treasury, threshBps, halted, deployBlock] = await contract.getConfig().catch(() => [null, null, null, null, null, null]);
+          if (guardian != null) {
+            $('configList').innerHTML = `
+              <div class="list-item"><span>Guardian</span><span class="val">${String(guardian).slice(0, 10)}…</span></div>
+              <div class="list-item"><span>Reporter</span><span class="val">${String(reporter).slice(0, 10)}…</span></div>
+              <div class="list-item"><span>Treasury</span><span class="val">${String(treasury).slice(0, 10)}…</span></div>
+              <div class="list-item"><span>Threshold (bps)</span><span class="val">${String(threshBps)}</span></div>
+              <div class="list-item"><span>Halted</span><span class="val">${halted ? 'Yes' : 'No'}</span></div>
+              <div class="list-item"><span>Deploy block</span><span class="val">${String(deployBlock)}</span></div>
+            `;
+          }
+          const series = await contract.getDrawdownSeries(DRAWDOWN_SERIES_LEN).catch(() => []);
+          const chartEl = $('drawdownChart');
+          if (chartEl && series && series.length > 0) {
+            const maxBps = Math.max(...series.map(Number), 1);
+            chartEl.innerHTML = series.map(function(bps) {
+              const pct = (Number(bps) / maxBps) * 100;
+              return '<div style="flex:1;min-width:8px;height:' + (40 + pct * 0.6) + 'px;background:linear-gradient(to top, var(--bear), transparent);border-radius:2px;" title="' + bps + ' bps"></div>';
+            }).join('');
+            chartEl.style.display = 'flex';
+            chartEl.style.alignItems = 'flex-end';
+            chartEl.style.height = '120px';
+            chartEl.style.gap = '4px';
+          } else if (chartEl) {
+            chartEl.innerHTML = 'Chart: connect contract and refresh to see drawdown series.';
+            chartEl.style.display = 'flex';
+          }
+          lastSummary = summary;
+        } catch (e) {
+          showMsg(e.message || 'Failed to load dashboard.', 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
