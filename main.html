@@ -196,3 +196,69 @@
       <p>Monitor drawdown, signals, and advisories. When the gauge crosses your threshold, consider reducing exposure.</p>
     </div>
 
+    <div id="messageBox"></div>
+    <div id="alertBox"></div>
+    <div id="recommendationDetail" class="recommendation hold" style="display:none;"></div>
+
+    <div class="refresh-row">
+      <span class="section-title">Dashboard</span>
+      <button type="button" class="btn small bull" id="btnRefresh">Refresh</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="label">Exit readiness</div><div class="stat-card value bear" id="statReadiness">—</div></div>
+      <div class="stat-card"><div class="label">Latest drawdown (bps)</div><div class="stat-card value" id="statDrawdown">—</div></div>
+      <div class="stat-card"><div class="label">Threshold (bps)</div><div class="stat-card value" id="statThreshold">—</div></div>
+      <div class="stat-card"><div class="label">Signals</div><div class="stat-card value" id="statSignals">—</div></div>
+      <div class="stat-card"><div class="label">Advisories</div><div class="stat-card value" id="statAdvisories">—</div></div>
+    </div>
+
+    <div class="gauge-card">
+      <h2>Exit readiness gauge</h2>
+      <div class="gauge-wrap">
+        <div class="gauge" id="gaugeEl" style="--pct: 0%">
+          <div class="gauge-inner">
+            <span class="gauge-value" id="gaugeValue">0%</span>
+            <span class="gauge-label">readiness</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="signals">Signals</button>
+      <button type="button" class="tab" data-tab="drawdowns">Drawdowns</button>
+      <button type="button" class="tab" data-tab="advisories">Advisories</button>
+      <button type="button" class="tab" data-tab="config">Config</button>
+    </div>
+
+    <div id="tabSignals" class="tab-content active">
+      <div class="list-card">
+        <h2>Recent exit signals</h2>
+        <div id="signalsList" class="empty-state">Connect and load contract to see signals.</div>
+      </div>
+    </div>
+    <div id="tabDrawdowns" class="tab-content">
+      <div class="list-card">
+        <h2>Recent drawdowns</h2>
+        <div id="drawdownsList" class="empty-state">Connect and load contract to see drawdowns.</div>
+      </div>
+    </div>
+    <div id="tabAdvisories" class="tab-content">
+      <div class="list-card">
+        <h2>Exit advisories</h2>
+        <div id="advisoriesList" class="empty-state">Connect and load contract to see advisories.</div>
+      </div>
+    </div>
+    <div id="tabConfig" class="tab-content">
+      <div class="list-card">
+        <h2>Contract config</h2>
+        <div id="configList" class="empty-state">Connect and load contract to see config.</div>
+      </div>
+    </div>
+
+    <div class="gauge-card">
+      <h2>Drawdown trend (last 10)</h2>
+      <div class="chart-placeholder" id="drawdownChart">Chart: connect contract and refresh to see drawdown series.</div>
+    </div>
+
+    <div class="list-card">
