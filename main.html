@@ -592,3 +592,69 @@
       function renderAdvisoriesFallback() {
         $('advisoriesList').innerHTML = '<div class="empty-state">No contract loaded. Paste BearDet address and ensure wallet is connected.</div>';
       }
+      function renderConfigFallback() {
+        $('configList').innerHTML = '<div class="empty-state">No contract loaded. Paste BearDet address and ensure wallet is connected.</div>';
+      }
+
+      function getReadinessDisplay(readinessBps) {
+        if (readinessBps == null) return '—';
+        const pct = Math.min(100, (Number(readinessBps) * 100) / BPS_DENOM);
+        return pct.toFixed(2) + '%';
+      }
+      function getGaugePct(readinessBps) {
+        if (readinessBps == null) return 0;
+        return Math.min(100, (Number(readinessBps) * 100) / BPS_DENOM);
+      }
+      // Optional: use getReadinessDisplay and getGaugePct when formatting stats
+      function formatStat(val, suffix) {
+        if (val == null || val === undefined) return '—';
+        return String(val) + (suffix || '');
+      }
+      // End of dashboard helpers — BullorBear.ai
+
+      function formatBps(bps) {
+        if (bps == null || bps === undefined) return '—';
+        return (Number(bps) / 100).toFixed(2) + '%';
+      }
+      function formatAddress(addr) {
+        if (!addr) return '—';
+        const s = String(addr);
+        return s.slice(0, 6) + '…' + s.slice(-4);
+      }
+      function setLoading(loading) {
+        document.body.classList.toggle('loading', !!loading);
+      }
+
+      async function refreshDashboard() {
+        if (!contract) return;
+        setLoading(true);
+        try {
+          const [summary, readiness, shouldExitVal] = await Promise.all([
+            contract.dashboardSummary().catch(() => null),
+            contract.exitReadinessBps().catch(() => null),
+            contract.shouldExit().catch(() => null)
+          ]);
+          if (summary) {
+            $('statReadiness').textContent = readiness != null ? (Number(readiness) / 100).toFixed(2) + '%' : '—';
+            $('statDrawdown').textContent = summary.latestDrawdownBps != null ? String(summary.latestDrawdownBps) : '—';
+            $('statThreshold').textContent = summary.thresholdBps != null ? String(summary.thresholdBps) : '—';
+            $('statSignals').textContent = summary.totalSignals != null ? String(summary.totalSignals) : '—';
+            $('statAdvisories').textContent = summary.totalAdvisories != null ? String(summary.totalAdvisories) : '—';
+            const pct = readiness != null ? Math.min(100, (Number(readiness) * 100) / BPS_DENOM) : 0;
+            const gauge = $('gaugeEl');
+            if (gauge) gauge.style.setProperty('--pct', pct + '%');
+            $('gaugeValue').textContent = (pct).toFixed(1) + '%';
+            const recEl = $('recommendationDetail');
+            if (recEl) {
+              recEl.style.display = '';
+              if (shouldExitVal) {
+                recEl.className = 'recommendation exit';
+                recEl.textContent = 'Exit recommended: latest drawdown is above your configured threshold. Consider reducing exposure or moving to stable assets. This is not financial advice.';
+              } else {
+                recEl.className = 'recommendation hold';
+                recEl.textContent = 'Below exit threshold. Keep monitoring drawdown and exit signals.';
+              }
+            }
+            if (shouldExitVal) {
+              showAlert('<div class="alert-box exit">Exit recommended: drawdown is above threshold. Consider reducing exposure.</div>');
+            } else {
