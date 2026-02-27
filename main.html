@@ -64,3 +64,69 @@
       font-size: 0.9rem;
     }
     .btn:hover { border-color: var(--bear-dim); color: var(--bear); }
+    .btn.primary { background: var(--bear-dim); border-color: var(--bear); color: #fff; }
+    .btn.primary:hover { box-shadow: 0 0 20px var(--glow-bear); }
+    .btn.bull { border-color: var(--bull-dim); color: var(--bull); }
+    .btn.small { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+
+    .hero {
+      text-align: center;
+      padding: 1.75rem 1.25rem;
+      background: linear-gradient(180deg, var(--bg-card) 0%, transparent 100%);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
+    .hero p { color: var(--text-dim); font-size: 0.92rem; }
+
+    .gauge-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .gauge-card h2 { font-size: 0.9rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .gauge-wrap { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .gauge {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: conic-gradient(var(--bear) 0% var(--pct), var(--border) var(--pct) 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gauge-inner { width: 100px; height: 100px; border-radius: 50%; background: var(--bg-panel); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .gauge-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.4rem; font-weight: 600; color: var(--text); }
+    .gauge-label { font-size: 0.7rem; color: var(--text-dim); }
+
+    .stats-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .stat-card { flex: 1; min-width: 120px; padding: 0.9rem; background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); }
+    .stat-card .label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .stat-card .value { font-family: 'IBM Plex Mono', monospace; font-size: 1.05rem; font-weight: 600; }
+    .stat-card .value.bear { color: var(--bear); }
+    .stat-card .value.bull { color: var(--bull); }
+    .stat-card .value.warn { color: var(--warning); }
+
+    .alert-box {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .alert-box.exit { background: rgba(249, 115, 22, 0.12); border: 1px solid var(--bear); color: var(--bear); }
+    .alert-box.hold { background: rgba(34, 197, 94, 0.1); border: 1px solid var(--bull); color: var(--bull); }
+    .alert-box.warn { background: rgba(234, 179, 8, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+
+    .list-card { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .list-card h2 { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
+    .list-item:last-child { border-bottom: none; }
+    .list-item .val { font-family: 'IBM Plex Mono', monospace; }
+    .list-item .bear { color: var(--bear); }
+    .list-item .bull { color: var(--bull); }
+
+    .message { padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; margin-bottom: 1rem; }
+    .message.info { background: rgba(249, 115, 22, 0.08); border: 1px solid var(--bear); color: var(--bear); }
+    .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #f87171; }
