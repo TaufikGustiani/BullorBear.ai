@@ -724,3 +724,64 @@
 
       document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', function() {
         document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+        const tabId = 'tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1);
+        const el = document.getElementById(tabId);
+        if (el) el.classList.add('active');
+      }));
+
+      $('btnConnect').addEventListener('click', connect);
+      $('btnDisconnect').addEventListener('click', disconnect);
+      $('btnRefresh').addEventListener('click', function() {
+        if (contract) refreshDashboard();
+        else showMsg('Connect wallet and set contract address first.', 'info');
+      });
+      $('contractAddr').addEventListener('change', loadContractIfSet);
+      $('contractAddr').addEventListener('blur', loadContractIfSet);
+
+      // Optional: prefill contract address from URL query, e.g. ?contract=0x...
+      (function readQueryContract() {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const addr = params.get('contract');
+          if (addr && $('contractAddr')) {
+            $('contractAddr').value = addr.trim();
+            if (provider) loadContractIfSet();
+          }
+        } catch (_) {}
+      })();
+
+      // Expose refresh for external callers (e.g. if embedded in iframe)
+      window.BullorBearRefresh = function() {
+        if (contract) return refreshDashboard();
+        return Promise.resolve();
+      };
+      window.BullorBearConnect = connect;
+      window.BullorBearDisconnect = disconnect;
+
+      // Persist contract address in localStorage so user does not have to re-enter
+      (function initContractFromStorage() {
+        try {
+          const stored = localStorage.getItem('BullorBear_contractAddress');
+          if (stored && $('contractAddr')) {
+            $('contractAddr').value = stored;
+          }
+        } catch (_) {}
+      })();
+      (function saveContractOnLoad() {
+        const input = $('contractAddr');
+        if (!input) return;
+        const save = function() {
+          try {
+            const v = (input.value || '').trim();
+            if (v) localStorage.setItem('BullorBear_contractAddress', v);
+          } catch (_) {}
+        };
+        input.addEventListener('change', save);
+        input.addEventListener('blur', save);
+      })();
+    })();
+  </script>
+</body>
+</html>
